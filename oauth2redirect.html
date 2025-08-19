@@ -1,8 +1,26 @@
 <!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OAuth redirect</title>
+<style>body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px;}</style>
+<h1>Redirect a ListeApp…</h1>
+<p id="status">Sto reindirizzando all'app, puoi chiudere questa pagina.</p>
+<p>
+  Se non succede nulla,
+  <a id="deeplink" href="listeapp://oauth2redirect">tocca qui per aprire l'app</a>.
+</p>
 <script>
-  const q = window.location.search || window.location.hash || "";
-  const target = "listeapp://oauth2redirect" + q; // <- deep link della tua app
-  window.location.replace(target);
+  // mantieni parametri (code, state, error…)
+  const q = location.search || location.hash || "";
+  const target = "listeapp://oauth2redirect" + q;
+  document.getElementById("deeplink").href = target;
+
+  // tenta redirect immediato
+  setTimeout(()=>location.replace(target), 50);
+
+  // aggiorna testo dopo 1s se il browser non apre l'app
+  setTimeout(()=>{
+    document.getElementById("status").textContent =
+      "Se l'app non si apre automaticamente, tocca il link qui sotto.";
+  }, 1000);
 </script>
-<p>Puoi chiudere questa pagina…</p>
+<noscript>Attiva JavaScript, poi riprova.</noscript>
