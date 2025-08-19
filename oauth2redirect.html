@@ -1,0 +1,8 @@
+<!doctype html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  const q = window.location.search || window.location.hash || "";
+  const target = "listeapp://oauth2redirect" + q; // <- deep link della tua app
+  window.location.replace(target);
+</script>
+<p>Puoi chiudere questa pagina…</p>
