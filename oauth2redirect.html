@@ -1,26 +1,49 @@
 <!doctype html>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>OAuth redirect</title>
-<style>body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:24px;}</style>
-<h1>Redirect a ListeApp…</h1>
-<p id="status">Sto reindirizzando all'app, puoi chiudere questa pagina.</p>
-<p>
-  Se non succede nulla,
-  <a id="deeplink" href="listeapp://oauth2redirect">tocca qui per aprire l'app</a>.
-</p>
-<script>
-  // mantieni parametri (code, state, error…)
-  const q = location.search || location.hash || "";
-  const target = "listeapp://oauth2redirect" + q;
-  document.getElementById("deeplink").href = target;
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OAuth redirect</title>
+  <style> body{font-family:system-ui,Segoe UI,Roboto,Arial;padding:20px} a{color:#1565c0} </style>
+</head>
+<body>
+  <h1>Redirect a ListeApp…</h1>
+  <p>Se l'app non si apre automaticamente, tocca il link qui sotto.</p>
+  <p><a id="openapp" href="#">tocca qui per aprire l'app</a></p>
 
-  // tenta redirect immediato
-  setTimeout(()=>location.replace(target), 50);
+  <script>
+    // Unisce query (?a=b) e hash (#a=b) -> Google talvolta mette parametri nel fragment
+    function parseParams(search, hash) {
+      const p = new URLSearchParams();
+      const pushAll = s => {
+        if (!s) return;
+        const sp = new URLSearchParams(s.replace(/^[?#]/, ''));
+        for (const [k, v] of sp.entries()) p.append(k, v);
+      };
+      pushAll(search);
+      pushAll(hash);
+      return p;
+    }
 
-  // aggiorna testo dopo 1s se il browser non apre l'app
-  setTimeout(()=>{
-    document.getElementById("status").textContent =
-      "Se l'app non si apre automaticamente, tocca il link qui sotto.";
-  }, 1000);
-</script>
-<noscript>Attiva JavaScript, poi riprova.</noscript>
+    (function () {
+      const params = parseParams(location.search, location.hash);
+      // Costruisci deep link identico (schema+host DEVONO combaciare con IntentFilter)
+      const base = "listeapp://oauth2redirect";
+      const qs = params.toString();
+      const target = qs ? `${base}?${qs}` : base;
+
+      // link visibile di fallback
+      const a = document.getElementById('openapp');
+      a.href = target;
+
+      // redirect automatico
+      try {
+        window.location.replace(target);
+      } catch (e) {
+        // come fallback, simula click dopo un attimo
+        setTimeout(() => a.click(), 300);
+      }
+    })();
+  </script>
+</body>
+</html>
